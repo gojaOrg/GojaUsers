@@ -3,8 +3,8 @@ const dbHandler = require('./db-handler');
 
 const userModel = require('../models/user');
 const userData = {
-    firstName: 'test',
-    lastName: 'testsson',
+    profileAudio: "audioURL",
+    userName: 'testersson',
     email: 'test@test.se',
 };
 
@@ -33,7 +33,8 @@ const userData = {
 
       const savedUser = await userModel.create(userData);
       expect(savedUser._id).toBeDefined();
-      expect(savedUser.firstName).toBe(userData.firstName);
+      expect(savedUser.profileAudio).toBe(userData.profileAudio);
+      expect(savedUser.userName).toBe(userData.userName);
       expect(savedUser.email).toBe(userData.email);
     });
 
@@ -51,14 +52,14 @@ const userData = {
     });
 
     it('insert user successfully, but the field does not defined in schema should be undefined', async () => {
-      const userWithInvalidField = new userModel({ firstName: 'test', email: 'testsson', nickname: 'Handsome tester' });
+      const userWithInvalidField = new userModel({ profileAudio: 'udioURL', userName: 'test', email: 'testsson', nickname: 'Handsome tester' });
       const savedUserWithInvalidField = await userWithInvalidField.save();
       expect(savedUserWithInvalidField._id).toBeDefined();
       expect(savedUserWithInvalidField.nickkname).toBeUndefined();
     });
 
     it('create user without required field should failed', async () => {
-      const userWithoutRequiredField = new userModel({ firstName: 'test' });
+      const userWithoutRequiredField = new userModel({ userName: 'test' });
       let err;
       try {
           const savedUserWithoutRequiredField = await userWithoutRequiredField.save();
