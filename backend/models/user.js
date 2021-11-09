@@ -7,7 +7,6 @@ const bcrypt = require("bcrypt");
 const UserSchema = new mongoose.Schema({
   profileAudio: {
     type: String,
-    required: true,
   },
   profilePicture: {
     type: String,
@@ -15,9 +14,6 @@ const UserSchema = new mongoose.Schema({
   userName: {
     type: String,
     required: true,
-  },
-  about: {
-    type: String,
   },
   email: {
     type: String,

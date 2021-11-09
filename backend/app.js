@@ -23,7 +23,6 @@ var db = require("./mongoose");
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
-var postRouter = require("./routes/post");
 
 var cookieParser = require("cookie-parser");
 
@@ -76,7 +75,6 @@ app.use(cookieParser());
 
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
-app.use("/posts", postRouter);
 
 // Use JSON parser for all non-webhook routes
 

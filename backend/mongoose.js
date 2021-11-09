@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
-const dbname =
-  process.env.NODE_ENV === "production" ? "prod" : "myFirstDatabase";
+const dbname = process.env.NODE_ENV === "production" ? "prod" : "GojaUsers";
 console.log("-----");
 console.log("this is the " + dbname + " database");
 console.log("-----");
