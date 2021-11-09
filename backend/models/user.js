@@ -70,4 +70,5 @@ async function checkUser(email, psw) {
 }
 
 exports.validate = validateUser;
-module.exports = User = mongoose.model("users", UserSchema);
+const userModel = new mongoose.model("User", UserSchema);
+module.exports = userModel;
