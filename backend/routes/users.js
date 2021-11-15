@@ -9,25 +9,10 @@ const upload = require("../middleware/imageUpload");
 
 const auth = require("../middleware/auth");
 
-// Create user for the first time
-router.post(
-  "/add-profile-picture",
-  upload.single("image"),
-  auth,
-  async function (req, res) {
-    console.log("HIHIIHI");
-    var id = req.user._id;
-    var userType;
-    const user = await User.findById(req.user._id);
+router.post("/upload-image", upload.single("image"), async function (req, res) {
+  res.json(req.file.location);
+});
 
-    let update = { profilePicture: req.file.location };
-    User.findByIdAndUpdate(id, update, { new: true })
-      .then((user) =>
-        res.status(200).json({ success: true, picURL: user.profilePicture })
-      )
-      .catch((err) => res.status(400).json({ success: false, error: err }));
-  }
-);
 router.post(
   "/signup",
   [
