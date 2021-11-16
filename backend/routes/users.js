@@ -58,7 +58,6 @@ router.post(
         const token = await newUser.generateAuthToken();
 
         res.send({
-          _id: newUser._id,
           token: token,
         });
       } catch (err) {
