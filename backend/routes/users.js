@@ -13,6 +13,7 @@ router.post("/upload-image", upload.single("image"), async function (req, res) {
   res.json(req.file.location);
 });
 
+
 router.post(
   "/signup",
   [
@@ -52,7 +53,6 @@ router.post(
         const token = await newUser.generateAuthToken();
 
         res.send({
-          _id: newUser._id,
           token: token,
         });
       } catch (err) {
