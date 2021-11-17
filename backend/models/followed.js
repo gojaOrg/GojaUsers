@@ -9,7 +9,7 @@ const FollowedSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
   },
-  followedUserIds: {
+  followed: {
     type: [mongoose.Schema.Types.ObjectId],
   },
 });

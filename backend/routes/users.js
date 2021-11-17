@@ -5,14 +5,17 @@ const config = require("config");
 const jwt = require("jsonwebtoken");
 const { body, validationResult } = require("express-validator");
 const User = require("../models/user");
+const Followed = require("../models/followed");
+const Following = require("../models/following");
+
 const upload = require("../middleware/imageUpload");
 
 const auth = require("../middleware/auth");
+const { response } = require("express");
 
 router.post("/upload-image", upload.single("image"), async function (req, res) {
   res.json(req.file.location);
 });
-
 
 router.post(
   "/signup",
@@ -111,5 +114,74 @@ router.post(
     }
   }
 );
+
+router.post("/follow", async (req, res, next) => {
+  console.log(req.body);
+  const form = req.body;
+
+  try {
+    // Set so that logged in user follows the selected user
+    const following = await Following.findOneAndUpdate(
+      {
+        userId: form.userId,
+      },
+      { $push: { following: form.userToFollow } }
+    );
+    if (!following) {
+      const following = new Following({
+        userId: form.userId,
+        following: [form.userToFollow],
+      });
+      await following.save();
+    }
+
+    // Set so that the selected user is followed by the logged in user
+
+    const followed = await Followed.findOneAndUpdate(
+      {
+        userId: form.userToFollow,
+      },
+      { $push: { followed: form.userId } }
+    );
+    if (!followed) {
+      const followed = new Followed({
+        userId: form.userToFollow,
+        followed: [form.userId],
+      });
+      await followed.save();
+    }
+    res.status(200).send("user followed");
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.post("/unfollow", async (req, res, next) => {
+  console.log(req.body);
+  const form = req.body;
+
+  try {
+    // Set so that logged in user unfollows the selected user
+    await Following.updateOne(
+      {
+        userId: form.userId,
+      },
+      { $pull: { following: form.userToUnfollow } }
+    );
+
+    // Set so that the selected user is no longer followed by the logged in user
+    await Followed.updateOne(
+      {
+        userId: form.userToUnfollow,
+      },
+      { $pull: { followed: form.userId } }
+    );
+    res.status(200).send("user unfollowed");
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 module.exports = router;
