@@ -9,15 +9,10 @@ const upload = require("../middleware/imageUpload");
 
 const auth = require("../middleware/auth");
 
-router.post(
-  "/upload-profilepicture",
-  upload.single("image"),
-  auth,
-  async function (req, res) {
-    var id = req.user._id;
-    res.json(req.file.location);
-  }
-);
+router.post("/upload-image", upload.single("image"), async function (req, res) {
+  res.json(req.file.location);
+});
+
 
 router.post(
   "/signup",
