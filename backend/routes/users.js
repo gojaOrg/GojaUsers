@@ -184,4 +184,30 @@ router.post("/unfollow", async (req, res, next) => {
   }
 });
 
+function escapeRegex(text) {
+  return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+}
+
+router.get("/search", async (req, res) => {
+  console.log("HITTING SEARCH");
+  const searchString = req.query.search;
+  console.log(searchString);
+  const regex = new RegExp(escapeRegex(searchString), "gi");
+  try {
+    await User.find({ userName: regex }, (error, foundUsers) => {
+      if (error) {
+        console.log(error);
+        res
+          .status(500)
+          .json({ message: "Something went wrong searching mongoDB" });
+      } else {
+        res.status(200).json(foundUsers);
+      }
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: "You fucked up the server" });
+  }
+});
+
 module.exports = router;
