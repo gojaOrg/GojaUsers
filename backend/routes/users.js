@@ -189,9 +189,7 @@ function escapeRegex(text) {
 }
 
 router.get("/search", async (req, res) => {
-  console.log("HITTING SEARCH");
   const searchString = req.query.search;
-  console.log(searchString);
   const regex = new RegExp(escapeRegex(searchString), "gi");
   try {
     await User.find({ userName: regex }, (error, foundUsers) => {
