@@ -13,6 +13,21 @@ const upload = require("../middleware/imageUpload");
 const auth = require("../middleware/auth");
 const { response } = require("express");
 
+router.get("/my-profile/:id", async (req, res) => {
+  try {
+    var user = await User.findById(req.params.id, {
+      profileAudio: 1,
+      profilePicture: 1,
+      userName: 1,
+      email: 1,
+    });
+    res.json(user);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 router.post("/upload-image", upload.single("image"), async function (req, res) {
   res.json(req.file.location);
 });
