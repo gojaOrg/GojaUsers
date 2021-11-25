@@ -58,46 +58,6 @@ router.get("/following/:id", async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
-router.get("/follower-count/:id", async (req, res) => {
-  try {
-    var followers = await Followers.aggregate([
-      { $match: { userId: ObjectId(req.params.id) } },
-
-      {
-        $project: {
-          _id: 1,
-          followers: {
-            $size: { $ifNull: ["$followers", []] },
-          },
-        },
-      },
-      { $unwind: "$followers" },
-    ]);
-    if (followers.length > 0) {
-      res.json(followers[0].followers);
-    } else {
-      res.json(0);
-    }
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-router.get("/following-count/:id", async (req, res) => {
-  try {
-    var following = await Following.find(
-      { userId: req.params.id },
-      {
-        following: 1,
-      }
-    );
-    res.json(following);
-  } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ message: "Server error" });
-  }
-});
 
 router.post("/upload-image", upload.single("image"), async function (req, res) {
   res.json(req.file.location);
