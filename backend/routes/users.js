@@ -20,6 +20,8 @@ router.get("/profile/:id", async (req, res) => {
       profileAudio: 1,
       profilePicture: 1,
       userName: 1,
+      followerCount: 1,
+      followingCount: 1,
       email: 1,
     });
     res.json(user);
