@@ -19,6 +19,14 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  followerCount: {
+    type: Number,
+    default: 0,
+  },
+  followingCount: {
+    type: Number,
+    default: 0,
+  },
   password: {
     type: String,
     minlength: 3,

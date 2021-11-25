@@ -5,15 +5,16 @@ const config = require("config");
 const jwt = require("jsonwebtoken");
 const { body, validationResult } = require("express-validator");
 const User = require("../models/user");
-const Followed = require("../models/followed");
+const Followers = require("../models/followers");
 const Following = require("../models/following");
 
 const upload = require("../middleware/imageUpload");
 
 const auth = require("../middleware/auth");
-const { response } = require("express");
+const mongoose = require("mongoose");
+const ObjectId = mongoose.Types.ObjectId;
 
-router.get("/my-profile/:id", async (req, res) => {
+router.get("/profile/:id", async (req, res) => {
   try {
     var user = await User.findById(req.params.id, {
       profileAudio: 1,
@@ -22,6 +23,76 @@ router.get("/my-profile/:id", async (req, res) => {
       email: 1,
     });
     res.json(user);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.get("/followers/:id", async (req, res) => {
+  try {
+    var followers = await Followers.find(
+      { userId: req.params.id },
+      {
+        followers: 1,
+      }
+    );
+    res.json(followers);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.get("/following/:id", async (req, res) => {
+  try {
+    var following = await Following.find(
+      { userId: req.params.id },
+      {
+        following: 1,
+      }
+    );
+    res.json(following);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+router.get("/follower-count/:id", async (req, res) => {
+  try {
+    var followers = await Followers.aggregate([
+      { $match: { userId: ObjectId(req.params.id) } },
+
+      {
+        $project: {
+          _id: 1,
+          followers: {
+            $size: { $ifNull: ["$followers", []] },
+          },
+        },
+      },
+      { $unwind: "$followers" },
+    ]);
+    if (followers.length > 0) {
+      res.json(followers[0].followers);
+    } else {
+      res.json(0);
+    }
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.get("/following-count/:id", async (req, res) => {
+  try {
+    var following = await Following.find(
+      { userId: req.params.id },
+      {
+        following: 1,
+      }
+    );
+    res.json(following);
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ message: "Server error" });
@@ -134,36 +205,58 @@ router.post("/follow", async (req, res, next) => {
   console.log(req.body);
   const form = req.body;
 
+  var userToFollowObj = await User.findById(form.userToFollow, {
+    profileAudio: 1,
+    profilePicture: 1,
+    userName: 1,
+  });
+  var myUserObj = await User.findById(form.userId, {
+    profileAudio: 1,
+    profilePicture: 1,
+    userName: 1,
+  });
+
   try {
     // Set so that logged in user follows the selected user
     const following = await Following.findOneAndUpdate(
       {
         userId: form.userId,
       },
-      { $push: { following: form.userToFollow } }
+      { $push: { following: userToFollowObj } }
     );
     if (!following) {
       const following = new Following({
         userId: form.userId,
-        following: [form.userToFollow],
+        following: [userToFollowObj],
       });
       await following.save();
     }
 
-    // Set so that the selected user is followed by the logged in user
+    // Update my following count
+    await User.findOneAndUpdate(
+      { _id: form.userId },
+      { $inc: { followingCount: 1 } }
+    );
 
-    const followed = await Followed.findOneAndUpdate(
+    // Update the other users follower count
+    await User.findOneAndUpdate(
+      { _id: form.userToFollow },
+      { $inc: { followerCount: 1 } }
+    );
+
+    // Set so that the selected user is followed by the logged in user
+    const followers = await Followers.findOneAndUpdate(
       {
         userId: form.userToFollow,
       },
-      { $push: { followed: form.userId } }
+      { $push: { followers: myUserObj } }
     );
-    if (!followed) {
-      const followed = new Followed({
+    if (!followers) {
+      const followers = new Followers({
         userId: form.userToFollow,
-        followed: [form.userId],
+        followers: [myUserObj],
       });
-      await followed.save();
+      await followers.save();
     }
     res.status(200).send("user followed");
   } catch (err) {
@@ -182,15 +275,15 @@ router.post("/unfollow", async (req, res, next) => {
       {
         userId: form.userId,
       },
-      { $pull: { following: form.userToUnfollow } }
+      { $pull: { following: { _id: form.userToUnfollow } } }
     );
 
     // Set so that the selected user is no longer followed by the logged in user
-    await Followed.updateOne(
+    await Followers.updateOne(
       {
         userId: form.userToUnfollow,
       },
-      { $pull: { followed: form.userId } }
+      { $pull: { followers: { _id: form.userId } } }
     );
     res.status(200).send("user unfollowed");
   } catch (err) {

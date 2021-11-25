@@ -4,12 +4,12 @@ const jwt = require("jsonwebtoken");
 const config = require("config");
 const bcrypt = require("bcrypt");
 
-const FollowingSchema = new mongoose.Schema({
+const FollowersSchema = new mongoose.Schema({
   created_at: { type: Date, default: Date.now },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
   },
-  following: {
+  followers: {
     type: [
       {
         id: mongoose.Schema.Types.ObjectId,
@@ -21,4 +21,4 @@ const FollowingSchema = new mongoose.Schema({
   },
 });
 
-module.exports = Following = mongoose.model("following", FollowingSchema);
+module.exports = Followers = mongoose.model("followers", FollowersSchema);
