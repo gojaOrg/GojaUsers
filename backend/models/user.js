@@ -7,9 +7,11 @@ const bcrypt = require("bcrypt");
 const UserSchema = new mongoose.Schema({
   profileAudio: {
     type: String,
+    default: "https://goja-audio.s3.eu-north-1.amazonaws.com/1637938469368",
   },
   profilePicture: {
     type: String,
+    default: "https://goja-images.s3.eu-north-1.amazonaws.com/1637938504319",
   },
   userName: {
     type: String,
