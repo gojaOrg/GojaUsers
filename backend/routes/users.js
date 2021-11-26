@@ -103,8 +103,9 @@ router.post(
         await newUser.save();
         const token = await newUser.generateAuthToken();
 
-        res.send({
+        res.json({
           token: token,
+          user: newUser,
         });
       } catch (err) {
         console.error(err.message);
@@ -146,7 +147,8 @@ router.post(
           // Check if password matches
           if (match) {
             const token = user.generateAuthToken();
-            res.send({
+            res.json({
+              user: newUser,
               token: token,
             });
           } else {
