@@ -33,7 +33,7 @@ router.get("/profile/:id", async (req, res) => {
 
 router.get("/followers/:id", async (req, res) => {
   try {
-    var followers = await Followers.find(
+    var followers = await Followers.findOne(
       { userId: req.params.id },
       {
         followers: 1,
@@ -48,7 +48,7 @@ router.get("/followers/:id", async (req, res) => {
 
 router.get("/following/:id", async (req, res) => {
   try {
-    var following = await Following.find(
+    var following = await Following.findOne(
       { userId: req.params.id },
       {
         following: 1,
