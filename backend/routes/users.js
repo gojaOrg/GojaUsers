@@ -91,7 +91,7 @@ router.post(
         //find an existing user
         var email = req.body.email.toLowerCase();
         let user = await User.findOne({ email: email });
-        if (user) return res.status(400).send("User already registered.");
+        if (user) return res.status(409).send("User already registered.");
 
         const newUser = new User({
           userName: form.userName,
@@ -155,7 +155,7 @@ router.post(
             res.status(401).send("email and password doesn't match");
           }
         } else {
-          res.status(400).send("User doesn't exist");
+          res.status(404).send("User doesn't exist");
         }
       } catch (err) {
         console.error(err.message);
