@@ -148,7 +148,7 @@ router.post(
           if (match) {
             const token = user.generateAuthToken();
             res.json({
-              user: newUser,
+              user: user,
               token: token,
             });
           } else {
