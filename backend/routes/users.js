@@ -43,7 +43,7 @@ router.get("/followers/:id", async (req, res) => {
           profileAudio: "$user.profileAudio",
           profilePicture: "$user.profilePicture",
           userName: "$user.userName",
-          id: "$user._id",
+          userId: "$user._id",
         },
       },
     ]);
@@ -69,7 +69,7 @@ router.get("/following/:id", async (req, res) => {
           profileAudio: "$follows.profileAudio",
           profilePicture: "$follows.profilePicture",
           userName: "$follows.userName",
-          id: "$follows._id",
+          userId: "$follows._id",
         },
       },
     ]);
