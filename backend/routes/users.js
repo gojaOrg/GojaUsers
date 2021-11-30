@@ -44,6 +44,7 @@ router.get("/followers/:id", async (req, res) => {
           profilePicture: "$user.profilePicture",
           userName: "$user.userName",
           userId: "$user._id",
+          isMutualFollowers: 1,
         },
       },
     ]);
@@ -70,6 +71,7 @@ router.get("/following/:id", async (req, res) => {
           profilePicture: "$follows.profilePicture",
           userName: "$follows.userName",
           userId: "$follows._id",
+          isMutualFollowers: 1,
         },
       },
     ]);
