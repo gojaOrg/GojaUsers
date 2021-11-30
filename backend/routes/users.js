@@ -6,8 +6,6 @@ const jwt = require("jsonwebtoken");
 const { body, validationResult } = require("express-validator");
 const User = require("../models/user");
 const Followers = require("../models/followers");
-const Following = require("../models/following");
-
 const upload = require("../middleware/imageUpload");
 
 const auth = require("../middleware/auth");
@@ -33,12 +31,22 @@ router.get("/profile/:id", async (req, res) => {
 
 router.get("/followers/:id", async (req, res) => {
   try {
-    var followers = await Followers.findOne(
-      { userId: req.params.id },
+    var followers = await Followers.aggregate([
       {
-        followers: 1,
-      }
-    );
+        $match: {
+          "follows._id": ObjectId(req.params.id),
+        },
+      },
+      {
+        $project: {
+          id: 1,
+          profileAudio: "$user.profileAudio",
+          profilePicture: "$user.profilePicture",
+          userName: "$user.userName",
+          id: "$user._id",
+        },
+      },
+    ]);
     res.json(followers);
   } catch (err) {
     console.error(err.message);
@@ -48,13 +56,24 @@ router.get("/followers/:id", async (req, res) => {
 
 router.get("/following/:id", async (req, res) => {
   try {
-    var following = await Following.findOne(
-      { userId: req.params.id },
+    console.log(req.params.id);
+    var followers = await Followers.aggregate([
       {
-        following: 1,
-      }
-    );
-    res.json(following);
+        $match: {
+          "user._id": ObjectId(req.params.id),
+        },
+      },
+      {
+        $project: {
+          id: 1,
+          profileAudio: "$follows.profileAudio",
+          profilePicture: "$follows.profilePicture",
+          userName: "$follows.userName",
+          id: "$follows._id",
+        },
+      },
+    ]);
+    res.json(followers);
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ message: "Server error" });
@@ -181,47 +200,34 @@ router.post("/follow", async (req, res, next) => {
   });
 
   try {
-    // Set so that logged in user follows the selected user
-    const following = await Following.findOneAndUpdate(
+    const isFollowingBack = await Followers.findOneAndUpdate(
       {
-        userId: form.userId,
+        "user._id": ObjectId(form.userToFollow),
+        "follows._id": ObjectId(form.userId),
       },
-      { $push: { following: userToFollowObj } }
+      { isMutualFollowers: true },
+      { new: true }
     );
-    if (!following) {
-      const following = new Following({
-        userId: form.userId,
-        following: [userToFollowObj],
-      });
-      await following.save();
+    var isMutualFollowers = false;
+    if (isFollowingBack) {
+      isMutualFollowers = true;
     }
+    const follower = new Followers({
+      user: myUserObj,
+      follows: userToFollowObj,
+      isMutualFollowers: isMutualFollowers,
+    });
+    await follower.save();
 
-    // Update my following count
     await User.findOneAndUpdate(
       { _id: form.userId },
       { $inc: { followingCount: 1 } }
     );
 
-    // Update the other users follower count
     await User.findOneAndUpdate(
       { _id: form.userToFollow },
       { $inc: { followerCount: 1 } }
     );
-
-    // Set so that the selected user is followed by the logged in user
-    const followers = await Followers.findOneAndUpdate(
-      {
-        userId: form.userToFollow,
-      },
-      { $push: { followers: myUserObj } }
-    );
-    if (!followers) {
-      const followers = new Followers({
-        userId: form.userToFollow,
-        followers: [myUserObj],
-      });
-      await followers.save();
-    }
     res.status(200).send("user followed");
   } catch (err) {
     console.error(err.message);
@@ -232,22 +238,27 @@ router.post("/follow", async (req, res, next) => {
 router.post("/unfollow", async (req, res, next) => {
   console.log(req.body);
   const form = req.body;
-
   try {
     // Set so that logged in user unfollows the selected user
-    await Following.updateOne(
+    console.log(form.userId);
+    await Followers.deleteOne({
+      "user._id": ObjectId(form.userId),
+      "follows._id": ObjectId(form.userToUnfollow),
+    });
+    await Followers.findOneAndUpdate(
       {
-        userId: form.userId,
+        "user._id": ObjectId(form.userToUnfollow),
+        "follows._id": ObjectId(form.userId),
       },
-      { $pull: { following: { _id: form.userToUnfollow } } }
+      { isMutualFollowers: false }
     );
-
-    // Set so that the selected user is no longer followed by the logged in user
-    await Followers.updateOne(
-      {
-        userId: form.userToUnfollow,
-      },
-      { $pull: { followers: { _id: form.userId } } }
+    await User.findOneAndUpdate(
+      { _id: form.userId },
+      { $inc: { followingCount: -1 } }
+    );
+    await User.findOneAndUpdate(
+      { _id: form.userToFollow },
+      { $inc: { followerCount: -1 } }
     );
     res.status(200).send("user unfollowed");
   } catch (err) {
