@@ -82,6 +82,28 @@ router.get("/following/:id", async (req, res) => {
   }
 });
 
+router.get("/following-for-my-feed/:id", async (req, res) => {
+  try {
+    console.log(req.params.id);
+    var followers = await Followers.aggregate([
+      {
+        $match: {
+          "user._id": ObjectId(req.params.id),
+        },
+      },
+      {
+        $project: {
+          userId: "$follows._id",
+        },
+      },
+    ]);
+    res.json(followers);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 router.post("/upload-image", upload.single("image"), async function (req, res) {
   res.json(req.file.location);
 });
