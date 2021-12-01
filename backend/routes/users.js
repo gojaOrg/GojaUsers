@@ -208,6 +208,36 @@ router.post(
   }
 );
 
+router.post("/add-profile-picture", async (req, res, next) => {
+  console.log(req.body);
+  const form = req.body;
+
+  try {
+    await User.findByIdAndUpdate(form.userId, {
+      profilePicture: form.url,
+    });
+    res.status(200).send("Profile picture added");
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.post("/add-profile-audio", async (req, res, next) => {
+  console.log(req.body);
+  const form = req.body;
+
+  try {
+    await User.findByIdAndUpdate(form.userId, {
+      profileAudio: form.url,
+    });
+    res.status(200).send("Profile audio added");
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 router.post("/follow", async (req, res, next) => {
   console.log(req.body);
   const form = req.body;
