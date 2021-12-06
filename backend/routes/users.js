@@ -331,7 +331,7 @@ router.get("/search", async (req, res) => {
   try {
     await User.find(
       { userName: regex },
-      { userName: 1, profileAudio: 1 },
+      { userName: 1, profilePicture: 1, _id: 1 },
       (error, foundUsers) => {
         if (error) {
           console.log(error);
