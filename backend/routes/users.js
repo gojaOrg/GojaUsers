@@ -329,22 +329,20 @@ router.get("/search", async (req, res) => {
   const searchString = req.query.search;
   const regex = new RegExp(escapeRegex(searchString), "gi");
   try {
-    var foundUsers = await User.aggregate([
-      {
-        $match: {
-          userName: regex,
-        },
-      },
-      {
-        $project: {
-          _id: 0,
-          userId: "$_id",
-          userName: 1,
-          profilePicture: 1,
-        },
-      },
-    ]);
-    res.status(200).json(foundUsers);
+    await User.find(
+      { userName: regex },
+      { userName: 1, profilePicture: 1, _id: 1 },
+      (error, foundUsers) => {
+        if (error) {
+          console.log(error);
+          res
+            .status(500)
+            .json({ message: "Something went wrong searching mongoDB" });
+        } else {
+          res.status(200).json(foundUsers);
+        }
+      }
+    );
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ message: "You fucked up the server" });
