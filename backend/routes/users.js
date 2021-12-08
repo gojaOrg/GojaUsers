@@ -238,6 +238,18 @@ router.post("/add-profile-audio", async (req, res, next) => {
   }
 });
 
+router.post("/update-profile-count", async (req, res, next) => {
+  console.log(req.body);
+  const userId = req.body.id;
+  try {
+    await User.findByIdAndUpdate(userId, { $inc: { postCount: 1 } });
+    res.status(200).send("Post count updated");
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 router.post("/follow", async (req, res, next) => {
   console.log(req.body);
   const form = req.body;
