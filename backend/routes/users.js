@@ -22,6 +22,11 @@ router.get("/profile/:id", async (req, res) => {
       followingCount: 1,
       email: 1,
     });
+    if (user) {
+      res.json(user);
+    } else {
+      res.status(401).send("Invalid token");
+    }
     res.json(user);
   } catch (err) {
     console.error(err.message);
