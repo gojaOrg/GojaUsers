@@ -27,7 +27,6 @@ router.get("/profile/:id", async (req, res) => {
     } else {
       res.status(401).send("Invalid token");
     }
-    res.json(user);
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ message: "Server error" });
