@@ -29,6 +29,10 @@ const UserSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  postCount: {
+    type: Number,
+    default: 0,
+  },
   password: {
     type: String,
     minlength: 3,
