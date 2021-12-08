@@ -137,8 +137,15 @@ router.post(
       try {
         //find an existing user
         var email = req.body.email.toLowerCase();
+        var userName = req.body.userName.toLowerCase();
         let user = await User.findOne({ email: email });
-        if (user) return res.status(409).send("User already registered.");
+        if (user) {
+          return res.status(409).send("Email already registered.");
+        }
+        let userNameExist = await User.findOne({ userName: userName });
+        if (userNameExist) {
+          return res.status(409).send("UserName already registered.");
+        }
 
         const newUser = new User({
           userName: form.userName,
