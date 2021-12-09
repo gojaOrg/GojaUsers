@@ -20,6 +20,7 @@ router.get("/profile/:id", async (req, res) => {
       userName: 1,
       followerCount: 1,
       followingCount: 1,
+      postCount: 1,
       email: 1,
     });
     if (user) {
@@ -249,7 +250,7 @@ router.post("/add-profile-audio", async (req, res, next) => {
   }
 });
 
-router.post("/update-profile-count", async (req, res, next) => {
+router.post("/update-post-count", async (req, res, next) => {
   console.log(req.body);
   const userId = req.body.id;
   try {
