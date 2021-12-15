@@ -17,6 +17,7 @@ router.get("/profile/:id/:me?", isFollowing, async (req, res) => {
   try {
     var user = await User.findById(req.params.id, {
       profileAudio: 1,
+      profileAudioFileType: 1,
       profilePicture: 1,
       userName: 1,
       followerCount: 1,
@@ -48,6 +49,7 @@ router.get("/followers/:id", async (req, res) => {
         $project: {
           _id: 0,
           profileAudio: "$user.profileAudio",
+          profileAudioFileType: "$user.profileAudioFileType",
           profilePicture: "$user.profilePicture",
           userName: "$user.userName",
           userId: "$user._id",
@@ -75,6 +77,7 @@ router.get("/following/:id", async (req, res) => {
         $project: {
           _id: 0,
           profileAudio: "$follows.profileAudio",
+          profileAudioFileType: "$user.profileAudioFileType",
           profilePicture: "$follows.profilePicture",
           userName: "$follows.userName",
           userId: "$follows._id",
@@ -244,6 +247,7 @@ router.post("/add-profile-audio", async (req, res, next) => {
   try {
     await User.findByIdAndUpdate(form.userId, {
       profileAudio: form.url,
+      profileAudioFileType: form.profileAudioFileType
     });
     res.status(200).send("Profile audio added");
   } catch (err) {
@@ -270,11 +274,13 @@ router.post("/follow", async (req, res, next) => {
 
   var userToFollowObj = await User.findById(form.userToFollow, {
     profileAudio: 1,
+    profileAudioFileType: 1,
     profilePicture: 1,
     userName: 1,
   });
   var myUserObj = await User.findById(form.userId, {
     profileAudio: 1,
+    profileAudioFileType: 1,
     profilePicture: 1,
     userName: 1,
   });

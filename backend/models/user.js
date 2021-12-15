@@ -9,6 +9,9 @@ const UserSchema = new mongoose.Schema({
     type: String,
     default: "https://goja-audio.s3.eu-north-1.amazonaws.com/1638966440317",
   },
+  profileAudioFileType: {
+    type: String,
+  },
   profilePicture: {
     type: String,
     default: "https://goja-images.s3.eu-north-1.amazonaws.com/1638966740440",

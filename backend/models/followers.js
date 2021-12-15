@@ -10,6 +10,7 @@ const FollowerSchema = new mongoose.Schema({
     type: {
       id: mongoose.Schema.Types.ObjectId,
       profileAudio: String,
+      profileAudioFileType: String,
       profilePicture: String,
       userName: String,
     },
@@ -18,6 +19,7 @@ const FollowerSchema = new mongoose.Schema({
     type: {
       id: mongoose.Schema.Types.ObjectId,
       profileAudio: String,
+      profileAudioFileType: String,
       profilePicture: String,
       userName: String,
     },
