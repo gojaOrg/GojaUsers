@@ -337,7 +337,7 @@ router.post("/unfollow", async (req, res, next) => {
       { $inc: { followingCount: -1 } }
     );
     await User.findOneAndUpdate(
-      { _id: form.userToUnFollow },
+      { _id: form.userToUnfollow },
       { $inc: { followerCount: -1 } }
     );
     res.status(200).send("user unfollowed");
