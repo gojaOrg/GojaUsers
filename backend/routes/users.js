@@ -7,12 +7,13 @@ const { body, validationResult } = require("express-validator");
 const User = require("../models/user");
 const Followers = require("../models/followers");
 const upload = require("../middleware/imageUpload");
+const isFollowing = require("../middleware/isFollowing");
 
 const auth = require("../middleware/auth");
 const mongoose = require("mongoose");
 const ObjectId = mongoose.Types.ObjectId;
 
-router.get("/profile/:id", async (req, res) => {
+router.get("/profile/:id/:me?", isFollowing, async (req, res) => {
   try {
     var user = await User.findById(req.params.id, {
       profileAudio: 1,
@@ -22,8 +23,9 @@ router.get("/profile/:id", async (req, res) => {
       followingCount: 1,
       postCount: 1,
       email: 1,
-    });
+    }).lean();
     if (user) {
+      user.isFollowing = req.isFollowing;
       res.json(user);
     } else {
       res.status(401).send("Invalid token");
