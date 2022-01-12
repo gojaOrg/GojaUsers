@@ -66,7 +66,6 @@ router.get("/followers/:id", async (req, res) => {
 
 router.get("/following/:id", async (req, res) => {
   try {
-    console.log(req.params.id);
     var followers = await Followers.aggregate([
       {
         $match: {
@@ -94,7 +93,6 @@ router.get("/following/:id", async (req, res) => {
 
 router.get("/following-for-my-feed/:id", async (req, res) => {
   try {
-    console.log(req.params.id);
     var followers = await Followers.aggregate([
       {
         $match: {
@@ -226,7 +224,6 @@ router.post(
 );
 
 router.post("/add-profile-picture", async (req, res, next) => {
-  console.log(req.body);
   const form = req.body;
 
   try {
@@ -241,13 +238,12 @@ router.post("/add-profile-picture", async (req, res, next) => {
 });
 
 router.post("/add-profile-audio", async (req, res, next) => {
-  console.log(req.body);
   const form = req.body;
 
   try {
     await User.findByIdAndUpdate(form.userId, {
       profileAudio: form.url,
-      profileAudioFileType: form.profileAudioFileType
+      profileAudioFileType: form.profileAudioFileType,
     });
     res.status(200).send("Profile audio added");
   } catch (err) {
@@ -257,7 +253,6 @@ router.post("/add-profile-audio", async (req, res, next) => {
 });
 
 router.post("/update-post-count", async (req, res, next) => {
-  console.log(req.body);
   const userId = req.body.id;
   try {
     await User.findByIdAndUpdate(userId, { $inc: { postCount: 1 } });
@@ -269,7 +264,6 @@ router.post("/update-post-count", async (req, res, next) => {
 });
 
 router.post("/follow", async (req, res, next) => {
-  console.log(req.body);
   const form = req.body;
 
   var userToFollowObj = await User.findById(form.userToFollow, {
@@ -322,11 +316,9 @@ router.post("/follow", async (req, res, next) => {
 });
 
 router.post("/unfollow", async (req, res, next) => {
-  console.log(req.body);
   const form = req.body;
   try {
     // Set so that logged in user unfollows the selected user
-    console.log(form.userId);
     await Followers.deleteOne({
       "user._id": ObjectId(form.userId),
       "follows._id": ObjectId(form.userToUnfollow),
