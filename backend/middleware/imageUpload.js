@@ -28,6 +28,7 @@ const upload = multer({
     acl: "public-read",
     s3,
     bucket: "goja-images",
+    contentType: multerS3.AUTO_CONTENT_TYPE,
     metadata: function (req, file, cb) {
       cb(null, { fieldName: "TESTING_METADATA" });
     },
