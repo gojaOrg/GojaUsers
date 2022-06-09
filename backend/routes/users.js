@@ -193,7 +193,6 @@ router.post(
     } else {
       // Data from form is valid. Store in database
       const form = req.body;
-      console.log(form);
 
       try {
         var email = req.body.email.toLowerCase();
